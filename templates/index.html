@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  /* ═══ WELCOME PAGE ═══ */
+  .welcome-wrap {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    gap: 28px;
+  }
+
+  .welcome-icon {
+    font-size: 80px;
+    animation: heart-beat 1.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255,105,180,0.6));
+  }
+  @keyframes heart-beat {
+    0%,100%{transform:scale(1)} 14%{transform:scale(1.18)} 28%{transform:scale(1)}
+    42%{transform:scale(1.12)} 70%{transform:scale(1)}
+  }
+
+  .welcome-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 7vw, 3rem);
+    font-style: italic;
+    line-height: 1.2;
+    background: linear-gradient(135deg, var(--pink-light), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .welcome-subtitle {
+    font-size: 1.05rem; color: var(--text-muted);
+    max-width: 420px; line-height: 1.7;
+  }
+
+  /* Glowing orbs decoration */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: orb-drift 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width:300px;height:300px; background:rgba(194,24,91,0.18); top:-80px; left:-80px; }
+  .orb2 { width:250px;height:250px; background:rgba(124,58,237,0.15); bottom:-60px; right:-60px; animation-delay:-4s; }
+  @keyframes orb-drift { from{transform:translate(0,0)} to{transform:translate(20px,20px)} }
+
+  /* Nav links */
+  .nav-links {
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    margin-top: 12px;
+  }
+  .nav-link {
+    font-size: 0.85rem; color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav-link:hover { color: var(--pink); border-color: var(--pink); }
+</style>
+
+<div class="welcome-wrap">
+  <!-- Decorative orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="welcome-icon">💖</div>
+
+  <h1 class="welcome-title">{{ welcome_title }}</h1>
+
+  <p class="welcome-subtitle">{{ welcome_message }}</p>
+
+  <a href="/game" class="btn btn-primary" style="font-size:1.1rem; padding:16px 44px;">
+    Begin Our Journey ❤️
+  </a>
+
+  <div class="nav-links">
+    <a href="/stats"  class="nav-link">📊 Our Stats</a>
+    <a href="/secret" class="nav-link" title="Secret page">🔒 Secret</a>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+  setProgress(0);
+</script>
+{% endblock %}
