@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+  .stats-wrap {
+    position: relative; z-index: 10;
+    min-height: 100vh; padding: 60px 20px 80px;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center; gap: 32px;
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem,6vw,2.8rem);
+    background: linear-gradient(135deg, var(--pink-light), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; font-style: italic;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px; width: 100%; max-width: 580px;
+  }
+  @media(max-width:400px){ .stats-grid{grid-template-columns:1fr;} }
+  .stat-card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 22px 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: var(--glow-purple); }
+  .stat-icon { font-size: 2.2rem; margin-bottom: 10px; }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 2rem; font-weight: 700;
+    background: linear-gradient(135deg, var(--pink), var(--purple));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .stat-label {
+    font-size: 0.8rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px;
+  }
+  .progress-section { width: 100%; max-width: 580px; }
+  .prog-bar-wrap {
+    background: rgba(255,255,255,0.06);
+    border-radius: 99px; height: 10px; overflow: hidden;
+    margin: 8px 0 4px;
+  }
+  .prog-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--pink-dark), var(--purple));
+    border-radius: 99px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+  }
+  .prog-labels { display: flex; justify-content: space-between; font-size:0.8rem; color:var(--text-muted); }
+</style>
+
+<div class="stats-wrap">
+  <h1 class="page-title">📊 Our Story in Numbers</h1>
+
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-value" id="s-days">…</div>
+      <div class="stat-label">Days Together</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏰</div>
+      <div class="stat-value" id="s-hours">…</div>
+      <div class="stat-label">Hours of Us</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💌</div>
+      <div class="stat-value" id="s-months">…</div>
+      <div class="stat-label">Months of Love</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✨</div>
+      <div class="stat-value" id="s-years">…</div>
+      <div class="stat-label">Beautiful Years</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎮</div>
+      <div class="stat-value" id="s-level">…</div>
+      <div class="stat-label">Levels Reached</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🌹</div>
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Love for You</div>
+    </div>
+  </div>
+
+  <div class="progress-section card">
+    <h3 style="font-family:var(--font-display); margin-bottom:16px; color:var(--pink-light);">
+      Game Progress
+    </h3>
+    <div id="level-bars"></div>
+  </div>
+
+  <a href="/" class="btn btn-outline">← Back Home</a>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  // Relationship duration
+  const start = new Date("{{ start_date }}");
+  const now   = new Date();
+  const diff  = now - start;
+  const totalDays   = Math.floor(diff / (1000*60*60*24));
+  const totalHours  = Math.floor(diff / (1000*60*60));
+  const totalMonths = Math.floor(totalDays / 30.44);
+  const totalYears  = (totalDays/365.25).toFixed(1);
+
+  document.getElementById("s-days").textContent   = totalDays.toLocaleString();
+  document.getElementById("s-hours").textContent  = totalHours.toLocaleString();
+  document.getElementById("s-months").textContent = totalMonths;
+  document.getElementById("s-years").textContent  = totalYears;
+
+  // Game progress
+  const saved = JSON.parse(localStorage.getItem("love_game_state_v1") || '{"level":1}');
+  const lvl   = typeof saved.level === "number" ? saved.level : 1;
+  document.getElementById("s-level").textContent = lvl + " / 6";
+
+  const levels = [
+    { label: "Level 1 — Romantic Question",  pct: Math.min(100, lvl>=1?100:0) },
+    { label: "Level 2 — Memory Challenge",   pct: Math.min(100, lvl>=2?100:0) },
+    { label: "Level 3 — Memory Gallery",     pct: Math.min(100, lvl>=3?100:0) },
+    { label: "Level 4 — Find the Heart",     pct: Math.min(100, lvl>=4?100:0) },
+    { label: "Level 5 — Secret Puzzle",      pct: Math.min(100, lvl>=5?100:0) },
+    { label: "Final Level — Slideshow",      pct: Math.min(100, lvl>=6?100:0) },
+  ];
+  const bars = document.getElementById("level-bars");
+  levels.forEach(l=>{
+    bars.innerHTML += `
+      <div style="margin-bottom:14px; text-align:left;">
+        <div class="prog-labels">
+          <span style="color:var(--text);">${l.label}</span>
+          <span>${l.pct}%</span>
+        </div>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-fill" style="width:0%" data-pct="${l.pct}"></div>
+        </div>
+      </div>`;
+  });
+  // Animate bars after render
+  setTimeout(()=>{
+    document.querySelectorAll(".prog-bar-fill").forEach(b=>{
+      b.style.width = b.dataset.pct + "%";
+    });
+  }, 200);
+})();
+</script>
+{% endblock %}
